@@ -7,7 +7,7 @@
 
 export PROJECTS_DIR="$HOME/daedal"
 export SPEC_BENCH="$PROJECTS_DIR/spec2006/benchspec/CPU2006"
-export BUILD_SCRIPTS="$PROJECTS_DIR/daedal-scripts/dae-buildscripts/build"
+export BUILD_SCRIPTS="$PROJECTS_DIR/daedal-scripts/dae-buildscripts"
 export LLVM_DIR="$PROJECTS_DIR/compiler/llvm"
 export LLVM_BIN="$PROJECTS_DIR/compiler/build/llvm-build/bin"
 export COMPILER_LIB="$PROJECTS_DIR/compiler/build/projects-build/lib"
