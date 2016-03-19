@@ -42,7 +42,9 @@ static __inline__ uint64_t rdtsc(void) {
 #error "*** Incompatible Architecture ***"
 #endif
 
+#ifdef __cplusplus
 extern "C" {
+#endif /* __cplusplus */
 
 extern volatile void *profiler_get_counters(uint64_t tid);
 extern uint64_t profiler_get_thread_id(void);
@@ -53,6 +55,8 @@ extern void profiler_start_execute(volatile void *arg);
 extern void profiler_end_execute(volatile void *arg);
 
 extern void profiler_print_stats(void);
+#ifdef __cplusplus
 }
+#endif /* __cplusplus */
 
 #endif /* __PROFILER_H__ */
