@@ -163,7 +163,7 @@ void profiler_stats_normalize(void) {
 }
 
 void profiler_print_stats(void) {
-  if (stat.size() == 0) {
+  if (!stat.size()) {
     printf("No statistics gathered.\n");
     return;
   }
