@@ -2,7 +2,7 @@
 ///
 /// \brief Interfacing DVFS support for DAE
 ///
-/// \copyright Eta Scale. Licensed under the DAEDAL Open Source License. See the LICENSE file for details.
+/// \copyright Eta Scale AB. Licensed under the Eta Scale Open Source License. See the LICENSE file for details.
 #include <cpufreq.h>
 #include <stdint.h>
 #include <stdio.h>
