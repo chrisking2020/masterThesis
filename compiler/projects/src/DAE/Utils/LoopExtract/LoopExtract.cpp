@@ -11,7 +11,7 @@
 ///
 /// \brief Extracts DAE-targeted loop
 ///
-/// \copyright Eta Scale. Licensed under the DAEDAL Open Source License. See
+/// \copyright Eta Scale AB. Licensed under the Eta Scale Open Source License. See
 /// the LICENSE file for details.
 //===----------------------------------------------------------------------===//
 #include "llvm/Analysis/LoopPass.h"

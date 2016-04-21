@@ -10,7 +10,7 @@
 ///
 /// \brief DAE with Multiversioning
 ///
-/// \copyright Eta Scale. Licensed under the DAEDAL Open Source License. See
+/// \copyright Eta Scale AB. Licensed under the Eta Scale Open Source License. See
 /// the LICENSE file for details.
 //
 // This file implements a pass identify every function with "_kernel_"

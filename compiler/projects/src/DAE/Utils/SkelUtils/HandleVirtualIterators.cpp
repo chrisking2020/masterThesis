@@ -10,7 +10,7 @@
 ///
 /// \brief Utility to add virtual iterator
 ///
-/// \copyright Eta Scale. Licensed under the DAEDAL Open Source License. See
+/// \copyright Eta Scale AB. Licensed under the Eta Scale Open Source License. See
 /// the LICENSE file for details.
 //
 // This file provides the functions for inserting a virtual

@@ -1,4 +1,4 @@
-# Copyright (C) Eta Scale AB. Licensed under the DAEDAL Open Source License. See the LICENSE file for details.
+# Copyright (C) Eta Scale AB. Licensed under the Eta Scale Open Source License. See the LICENSE file for details.
 
 add_library(DAE_prof_ST STATIC profiler.cpp)
 add_library(DAE_prof_OMP STATIC profiler.cpp)

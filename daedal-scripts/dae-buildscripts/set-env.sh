@@ -1,4 +1,4 @@
-# Copyright (C) Eta Scale AB. Licensed under the DAEDAL Open Source License. See the LICENSE file for details.
+# Copyright (C) Eta Scale AB. Licensed under the Eta Scale Open Source License. See the LICENSE file for details.
 
 # This script sets the environment needed by the other scripts.
 # The lines in this script needs to be run by a parent

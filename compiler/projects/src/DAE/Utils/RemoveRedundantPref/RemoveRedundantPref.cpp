@@ -11,7 +11,7 @@
 ///
 /// \brief Pass to remove redundant prefetches
 ///
-/// \copyright Eta Scale. Licensed under the DAEDAL Open Source License. See
+/// \copyright Eta Scale AB. Licensed under the Eta Scale Open Source License. See
 /// the LICENSE file for details.
 //===----------------------------------------------------------------------===//
 #include "llvm/Analysis/AliasAnalysis.h"
