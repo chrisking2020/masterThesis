@@ -1,0 +1,123 @@
+# Copyright (C) Eta Scale AB. Licensed under the Eta Scale Open Source License. See the LICENSE file for details.
+
+######
+# Makefile for DAE Code (latest updated October 2016).
+# 
+
+include $(LEVEL)/common/Makefile.environment
+
+######
+# Environment
+#
+
+# LLVM tools
+OPT=$(LLVM_BIN)/opt
+CLANG=$(LLVM_BIN)/clang 
+CLANGCPP=$(LLVM_BIN)/clang++
+
+DVFS_FLAGS=$(COMPILER_LIB)/libDAE_prof_ST.a -lcpufreq
+
+# DAE Marking
+DAE_MARKER='__kernel__'
+
+######
+# Helper definitions
+#
+
+# Retrieving information from target file name
+get_gran=$(shell echo $@ | sed -n 's/.*\.gran\([0-9]*\)\..*/\1/p')
+get_indir=$(shell echo $@ | sed -n 's/.*\.indir\([0-9]*\)\..*/\1/p')
+
+# Helper to generate prerequisites of rules
+get_dae_prerequisites=$$(shell echo $$@ | sed 's/indir.*/extract.ll/g')
+get_marked=$$(addprefix $(BINDIR)/, $$(addsuffix .marked.ll,$$(basename $$(SRCS))))
+get_objects=$$(addprefix $(BINDIR)/, $$(addsuffix .ll, $$(basename $$(SRCS))))
+get_gran_files=$$(shell grep -l "__kernel__" $(BINDIR)/*.marked.ll | sed 's/.marked.ll/.gran.ll/g')
+get_kernel_marked_files=$$(shell grep -l "__kernel__\|main" $(BINDIR)/*.marked.ll | sed 's/.marked.ll/.$$*.O3.ll/g')
+get_unmodified_files=$$(shell grep -l -L '__kernel__\|main' $(BINDIR)/*.marked.ll | sed 's/.marked/.marked.O3/g')
+
+# Debugging purposes: keep all generated ll files
+.PRECIOUS: %.ll
+.PHONY: $(get_gran_files)
+.SECONDARY:
+
+.SECONDEXPANSION:
+
+# Create marked files first (marked whether to decouple or not), then
+# evaluate how to build the targets
+all: $(get_marked)
+
+	$(MAKE) $(TARGETS)
+
+# Main makefile rules
+#
+$(BINDIR)/%.$(ORIGINAL_SUFFIX): $(get_objects)
+	$(CLANGCPP) $(CXXFLAGS) $(CFLAGS) $^ $(LDFLAGS) -L $(COMPILER_LIB) -o $@
+
+$(BINDIR)/$(BENCHMARK).%: $(get_unmodified_files) $(get_kernel_marked_files) $(BINDIR)/$(BENCHMARK).%.GV_DAE.ll
+	$(CLANGCPP) $(CXXFLAGS) $(CFLAGS) $^ $(LDFLAGS) $(DVFS_FLAGS) -o $@
+
+%.dae.ll: $(get_dae_prerequisites)
+	$(eval $@_INDIR:=$(get_indir))
+	$(OPT) -S -load $(COMPILER_LIB)/libFKernelPrefetch.so \
+	-tbaa -basicaa -f-kernel-prefetch \
+        -indir-thresh $($@_INDIR) -follow-partial \
+	-always-inline -O3 -load $(COMPILER_LIB)/libRemoveRedundantPref.so -rrp -o $@ $^
+
+$(BINDIR)/DAE-header.ll: $(get_gran_files)
+	head -n 3 $< | tail -n -2 > $@
+
+%.GV_DAE.ll: $(BINDIR)/DAE-header.ll $(BINDIR)/Globals.ll
+	$(eval $@_GRAN:=$(get_gran))
+	cat $^ |  sed 's/\(_granularity.* \)[0-9]\+/\1'"${$@_GRAN}"'/g' > $@
+
+$(BINDIR)/Globals.ll: $(get_gran_files)
+	mv Globals.ll $(BINDIR)
+
+
+# General object rules
+#
+$(BINDIR)/%.ll: %.c
+	mkdir -p $(BINDIR)/$(shell dirname $^)
+	$(CLANG) $(CFLAGS) $^ -S -emit-llvm -o $@
+
+$(BINDIR)/%.ll: %.cpp
+	mkdir -p $(BINDIR)/$(shell dirname $<)
+	$(CLANGCPP) $(CXXFLAGS) $^ -S -emit-llvm -o $@
+
+$(BINDIR)/%.ll: %.cc
+	mkdir -p $(BINDIR)/$(shell dirname $<)
+	$(CLANGCPP) $(CXXFLAGS)  $^ -S -emit-llvm -o $@
+
+%.O3.ll: %.ll
+	$(OPT) -S -O3 $^ -o $@
+
+# DAE related rules
+#
+%.marked.ll: %.stats.ll
+	 $(OPT) -S -load $(COMPILER_LIB)/libMarkLoopsToTransform.so \
+	-mark-loops -require-delinquent=false -bench-name $(BENCHMARK) \
+	-o $@ $<; \
+
+%.gran.ll: %.marked.ll
+	-$(OPT) -S -loop-simplify -reg2mem -licm -load $(COMPILER_LIB)/libLoopChunk.so \
+	-loop-chunk -bench-name $(BENCHMARK) -mem2reg -o $@ $<
+
+
+%.extract.ll: $$(shell echo $$@ | sed 's/.gran[0-9]\+.*/.gran.ll/g')
+	$(OPT) -S -load $(COMPILER_LIB)/libLoopExtract.so \
+	-aggregate-extracted-args -second-loop-extract -is-dae -bench-name $(BENCHMARK) -o $@ $<; \
+
+
+%.stats.ll: %.ll
+	cat $< \
+	| sed 's/tail \(call void @exit(\)/\1/g' \
+	| sed 's/call void @exit(/call void @profiler_print_stats()\n  &/g' \
+	| sed 's/declare void @exit(/declare void @profiler_print_stats()\n&/g' \
+	> $@
+
+%.cae.ll: %.extract.ll
+	$(OPT) -S -load $(COMPILER_LIB)/libTimeOrig.so -papi-orig -always-inline -o $@ $<;
+
+clean:
+	rm -f $(BINDIR)/* 

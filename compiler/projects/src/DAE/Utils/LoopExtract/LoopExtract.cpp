@@ -70,14 +70,13 @@ static RegisterPass<LoopExtract>
 bool LoopExtract::runOnLoop(Loop *L, LPPassManager &LPM) {
   // if already extracted
   Function *F = L->getHeader()->getParent();
-  if (!toBeDAE(F)) {
-    return false;
-  }
 
   // find the chunked loops
   if (IsDae) {
-    unsigned depth = BenchName.compare("429.mcf") == 0 ? 3 : 2;
-    if (L->getLoopDepth() != depth) {
+    // parent loop has to be marked
+    bool isMarked = L->getParentLoop() &&
+      L->getParentLoop()->getHeader()->getName().str().find(F_KERNEL_SUBSTR) != string::npos;
+    if (!isMarked) {
       return false;
     }
   } else {

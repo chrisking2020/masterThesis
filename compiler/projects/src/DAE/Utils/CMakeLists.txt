@@ -5,4 +5,5 @@ add_subdirectory(LoopExtract)
 add_subdirectory(RemoveRedundantPref)
 add_subdirectory(TimeOrig)
 add_subdirectory(StoreBack)
+add_subdirectory(MarkLoopsToTransform)
 

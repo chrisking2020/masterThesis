@@ -28,6 +28,8 @@
 
 using namespace llvm;
 
+#define F_KERNEL_SUBSTR "__kernel__"
+
 static cl::opt<std::string> BenchName("bench-name",
                                       cl::desc("The benchmark name"),
                                       cl::value_desc("name"));
@@ -47,8 +49,7 @@ struct LoopChunk : public LoopPass {
     BasicBlock *h = L->getHeader();
     Function *F = h->getParent();
 
-    unsigned depth = BenchName.compare("429.mcf") == 0 ? 2 : 1;
-    if ((L->getLoopDepth() == depth) && (toBeDAE(F))) {
+    if (L->getHeader()->getName().str().find(F_KERNEL_SUBSTR) != string::npos) {
       LoopInfo *LI = &getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
       Value *vi, *ub;
       Instruction *lvi;
