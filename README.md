@@ -85,7 +85,7 @@ Feel free to try the example benchmark and change/extend to your own application
 * Copy the **myBenchmark** directory and replace the sources with your application's source.
 * Change the **Makefile** in  your new benchmark directory to use the correct sources, compiler flags, and name:
 ```
-$(path to daedal)/sources/myBenchmark/Makefile
+$(path to daedal)/sources/myBenchmark/src/Makefile
 ```
 * Change the source **Makefile** in order to build your benchmark. Add the name of the directory of your benchmark to the list in here:
 ```
