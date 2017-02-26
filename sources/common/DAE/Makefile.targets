@@ -19,7 +19,7 @@ DAE_TARGETS=$(foreach type, $(DAE_TYPE), \
 			$(foreach gran, $(GRAN_COUNT), \
 				$(BENCHMARK).gran$(gran).indir$(indir).$(type))))
 
-CAE_TARGETS=$(foreach indir, $(INDIR_COUNT), $(BENCHMARK).gran$(indir).$(CAE_SUFFIX))
+CAE_TARGETS=$(foreach gran, $(GRAN_COUNT), $(BENCHMARK).gran$(gran).$(CAE_SUFFIX))
 
 ALLTARGETS=$(DAE_TARGETS) $(CAE_TARGETS) $(ORIGINAL_TARGETS) 
 
