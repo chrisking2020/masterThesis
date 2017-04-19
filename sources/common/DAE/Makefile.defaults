@@ -32,9 +32,14 @@ get_indir=$(shell echo $@ | sed -n 's/.*\.indir\([0-9]*\)\..*/\1/p')
 get_dae_prerequisites=$$(shell echo $$@ | sed 's/indir.*/extract.ll/g')
 get_marked=$$(addprefix $(BINDIR)/, $$(addsuffix .marked.ll,$$(basename $$(SRCS))))
 get_objects=$$(addprefix $(BINDIR)/, $$(addsuffix .ll, $$(basename $$(SRCS))))
-get_gran_files=$$(shell grep -l "__kernel__" $(BINDIR)/*.marked.ll | sed 's/.marked.ll/.gran.ll/g')
-get_kernel_marked_files=$$(shell grep -l "__kernel__\|main" $(BINDIR)/*.marked.ll | sed 's/.marked.ll/.$$*.O3.ll/g')
-get_unmodified_files=$$(shell grep -l -L '__kernel__\|main' $(BINDIR)/*.marked.ll | sed 's/.marked/.marked.O3/g')
+
+get_gran_files=$$(shell find $(BINDIR)/ -name *marked.ll | xargs grep -l "__kernel__" | sed 's/.marked.ll/.gran.ll/g')
+get_kernel_marked_files=$$(shell find $(BINDIR)/ -name *marked.ll | xargs grep -l "__kernel__\|main" | sed 's/.marked.ll/.$$*.O3.ll/g')
+get_unmodified_files=$$(shell find $(BINDIR)/ -name *marked.ll | xargs grep -l -L "__kernel__\|main" | sed 's/.marked/.marked.O3/g')
+
+#get_gran_files=$$(shell grep -lr "__kernel__" $(BINDIR)/*.marked.ll | sed 's/.marked.ll/.gran.ll/g')
+#get_kernel_marked_files=$$(shell grep -lr "__kernel__\|main" $(BINDIR)/*.marked.ll | sed 's/.marked.ll/.$$*.O3.ll/g')
+#get_unmodified_files=$$(shell grep -lr -L '__kernel__\|main' $(BINDIR)/*.marked.ll | sed 's/.marked/.marked.O3/g')
 
 # Debugging purposes: keep all generated ll files
 .PRECIOUS: %.ll
@@ -120,4 +125,4 @@ $(BINDIR)/%.ll: %.cc
 	$(OPT) -S -load $(COMPILER_LIB)/libTimeOrig.so -papi-orig -always-inline -o $@ $<;
 
 clean:
-	rm -f $(BINDIR)/* 
+	rm -rf $(BINDIR)/* 
